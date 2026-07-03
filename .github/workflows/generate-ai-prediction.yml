@@ -45,15 +45,6 @@ jobs:
         run: |
           git diff --quiet data/ || echo "changed=true" >> $GITHUB_OUTPUT
 
-      - name: Commit and push if changed
-        if: steps.check_changes.outputs.changed == 'true'
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add data/ai_predictions.json data/predictions_history.json
-          git commit -m "chore: generate AI predictions $(date +'%Y-%m-%d %H:%M:%S')"
-          git push
-
       - name: Summary
         if: steps.check_changes.outputs.changed == 'true'
         run: |
