@@ -34,7 +34,7 @@ jobs:
         run: python3 generate_ai_prediction.py
         env:
           SSQ_AI_BASE_URL: ${{ secrets.SSQ_AI_BASE_URL }}
-          SSQ_AI_API_KEY: ${{ secrets.AI_BASE_URL }}
+          SSQ_AI_API_KEY: ${{ secrets.SSQ_AI_API_KEY }}
           SSQ_PUSH_PLUS_TOKEN: ${{ secrets.SSQ_PUSH_PLUS_TOKEN }}
           SSQ_BA_ZI: ${{ secrets.SSQ_BA_ZI }}
 
