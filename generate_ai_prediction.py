@@ -655,7 +655,7 @@ def send_pushplus(title, content, token):
     使用 pushplus 发送 HTML 模板通知
     """
     # 基础 URL
-    base_url = "http://www.pushplus.plus/send"
+    base_url = "https://www.pushplus.plus/send"
     # 构建请求参数
     # 使用 params 参数，requests 库会自动帮你进行 URL 编码（解决中文乱码问题）
     payload = {
