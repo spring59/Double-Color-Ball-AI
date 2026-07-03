@@ -29,7 +29,8 @@ class LotteryDataFetcher:
     """双色球数据获取器"""
     
     def __init__(self):
-        self.base_url = "https://datachart.500.com/ssq/history/history.shtml"
+        # self.base_url = "https://datachart.500.com/ssq/history/history.shtml"
+        self.base_url = "https://datachart.500.com/ssq/history/newinc/history.php?limit=100&sort=0"
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -303,7 +304,9 @@ class LotteryDataFetcher:
 
                 # 同时更新到 ../data/lottery_history.json
                 try:
-                    web_data_path = os.path.join(os.path.dirname(filename), '..', 'data', 'lottery_history.json')
+                    # 使用脚本文件所在目录构建绝对路径，避免因工作目录不同导致路径错误
+                    script_dir = os.path.dirname(os.path.abspath(__file__))
+                    web_data_path = os.path.join(script_dir, '..', 'data', 'lottery_history.json')
                     formatted_data = self.format_for_web(merged_data)
 
                     with open(web_data_path, 'w', encoding='utf-8') as f:

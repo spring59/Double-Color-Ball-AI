@@ -1,0 +1,13 @@
+# OpenAI SDK
+openai>=1.54.0
+
+# 网页解析
+beautifulsoup4>=4.12.3
+lxml>=5.2.0
+
+# HTTP 请求
+requests>=2.31.0
+urllib3>=2.2.0
+
+# 环境变量管理
+python-dotenv>=1.0.0
