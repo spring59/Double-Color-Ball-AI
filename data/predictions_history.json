@@ -2,6 +2,593 @@
   "历史预测记录": "本文件保存已开奖期号的AI预测数据，用于对比和统计",
   "predictions_history": [
     {
+      "prediction_date": "2026-07-02",
+      "target_period": "26075",
+      "actual_result": {
+        "period": "26075",
+        "red_balls": [
+          "08",
+          "12",
+          "18",
+          "21",
+          "24",
+          "30"
+        ],
+        "blue_ball": "01",
+        "date": "2026-07-02"
+      },
+      "models": [
+        {
+          "model_id": "glm-5.2",
+          "model_name": "glm-5.2",
+          "predictions": [
+            {
+              "group_id": 1,
+              "strategy": "增强型热号追随者",
+              "red_balls": [
+                "03",
+                "08",
+                "19",
+                "21",
+                "26",
+                "32"
+              ],
+              "blue_ball": "08",
+              "description": "5期高频08(3次)、19(2次)、26(2次)；区间分布2-2-2；蓝球08(20期内4次)；总和109",
+              "hit_result": {
+                "red_hits": [
+                  "08",
+                  "21"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            },
+            {
+              "group_id": 2,
+              "strategy": "增强型冷号逆向者",
+              "red_balls": [
+                "02",
+                "10",
+                "15",
+                "20",
+                "25",
+                "33"
+              ],
+              "blue_ball": "02",
+              "description": "选择长遗漏20(遗漏12期)、25(遗漏4期)；奇偶3:3，大小3:3；蓝球02(遗漏9期)；总和105",
+              "hit_result": {
+                "red_hits": [],
+                "red_hit_count": 0,
+                "blue_hit": false,
+                "total_hits": 0
+              }
+            },
+            {
+              "group_id": 3,
+              "strategy": "增强型平衡策略师",
+              "red_balls": [
+                "07",
+                "14",
+                "15",
+                "24",
+                "29",
+                "30"
+              ],
+              "blue_ball": "10",
+              "description": "中频号为主，奇偶3:3，大小3:3；总和119；无连号；区间分布1-2-3；蓝球10(中频)",
+              "hit_result": {
+                "red_hits": [
+                  "24",
+                  "30"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            },
+            {
+              "group_id": 4,
+              "strategy": "增强型周期理论家",
+              "red_balls": [
+                "03",
+                "08",
+                "16",
+                "19",
+                "24",
+                "26"
+              ],
+              "blue_ball": "05",
+              "description": "选择08(趋势分+40)、19(趋势分+30)等上升趋势号；蓝球05(当前遗漏3期，平均遗漏6期)",
+              "hit_result": {
+                "red_hits": [
+                  "08",
+                  "24"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            },
+            {
+              "group_id": 5,
+              "strategy": "增强型综合决策者",
+              "red_balls": [
+                "08",
+                "09",
+                "15",
+                "19",
+                "24",
+                "32"
+              ],
+              "blue_ball": "07",
+              "description": "08(综合分85，热号+周期双高)、15(综合分78)；奇偶3:3；总和107；来自热号2个、冷号1个、周期2个、平衡1个",
+              "hit_result": {
+                "red_hits": [
+                  "08",
+                  "24"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            },
+            {
+              "group_id": 6,
+              "strategy": "玄门命理风水师",
+              "red_balls": [
+                "02",
+                "11",
+                "20",
+                "21",
+                "29",
+                "32"
+              ],
+              "blue_ball": "09",
+              "description": "周四属木逢亥时水，生旺木水，选02,11,20,21,29,32；期号26075得巽卦，喜水木；奇偶3:3；蓝球09属性为水助局",
+              "hit_result": {
+                "red_hits": [
+                  "21"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            }
+          ],
+          "best_group": 1,
+          "best_hit_count": 2
+        },
+        {
+          "model_id": "gemini-3-flash-preview",
+          "model_name": "gemini-3-flash-preview",
+          "predictions": [
+            {
+              "group_id": 1,
+              "strategy": "增强型热号追随者",
+              "red_balls": [
+                "03",
+                "08",
+                "19",
+                "21",
+                "29",
+                "30"
+              ],
+              "blue_ball": "02",
+              "description": "选择08(5期3次)、03(5期2次)等加权高频热号；区间分布2-2-2平衡；蓝球02为20期内高频且遗漏9期；总和110",
+              "hit_result": {
+                "red_hits": [
+                  "08",
+                  "21",
+                  "30"
+                ],
+                "red_hit_count": 3,
+                "blue_hit": false,
+                "total_hits": 3
+              }
+            },
+            {
+              "group_id": 2,
+              "strategy": "增强型冷号逆向者",
+              "red_balls": [
+                "01",
+                "04",
+                "11",
+                "20",
+                "22",
+                "29"
+              ],
+              "blue_ball": "15",
+              "description": "锁定20(遗漏20期)、22(遗漏14期)等冷号；奇偶比3:3，大小比3:3，尾数覆盖5个；蓝球15遗漏10期回温",
+              "hit_result": {
+                "red_hits": [],
+                "red_hit_count": 0,
+                "blue_hit": false,
+                "total_hits": 0
+              }
+            },
+            {
+              "group_id": 3,
+              "strategy": "增强型平衡策略师",
+              "red_balls": [
+                "06",
+                "10",
+                "17",
+                "19",
+                "25",
+                "26"
+              ],
+              "blue_ball": "07",
+              "description": "中频号为主，奇偶比3:3，大小比2:4；总和103；包含1对连号(25-26)；蓝球07为中频适中号",
+              "hit_result": {
+                "red_hits": [],
+                "red_hit_count": 0,
+                "blue_hit": false,
+                "total_hits": 0
+              }
+            },
+            {
+              "group_id": 4,
+              "strategy": "增强型周期理论家",
+              "red_balls": [
+                "08",
+                "13",
+                "19",
+                "23",
+                "26",
+                "32"
+              ],
+              "blue_ball": "15",
+              "description": "选择26(趋势分+50)、08(趋势分+40)等上升及转折号；蓝球15当前遗漏10期，最契合其历史平均遗漏",
+              "hit_result": {
+                "red_hits": [
+                  "08"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            },
+            {
+              "group_id": 5,
+              "strategy": "增强型综合决策者",
+              "red_balls": [
+                "03",
+                "08",
+                "13",
+                "19",
+                "26",
+                "32"
+              ],
+              "blue_ball": "08",
+              "description": "综合分高值组合，融合热号08、周期26及平衡号；奇偶比3:3，大小比3:3；总和101；蓝球08综合得分最高",
+              "hit_result": {
+                "red_hits": [
+                  "08"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            },
+            {
+              "group_id": 6,
+              "strategy": "玄门命理风水师",
+              "red_balls": [
+                "01",
+                "12",
+                "19",
+                "20",
+                "31",
+                "32"
+              ],
+              "blue_ball": "09",
+              "description": "周四木逢亥时水，生旺木水；期号起雷天大壮卦，选01,12,19等数理；阴阳比3:3；蓝球09属水理气相投",
+              "hit_result": {
+                "red_hits": [
+                  "12"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            }
+          ],
+          "best_group": 1,
+          "best_hit_count": 3
+        },
+        {
+          "model_id": "sensenova-6.7-flash-lite",
+          "model_name": "sensenova-6.7-flash-lite",
+          "predictions": [
+            {
+              "group_id": 1,
+              "strategy": "增强型热号追随者",
+              "red_balls": [
+                "08",
+                "16",
+                "24",
+                "28",
+                "29",
+                "30"
+              ],
+              "blue_ball": "08",
+              "description": "08(5期3次),16(5期1次),24(5期1次),28(5期1次),29(5期1次),30(5期1次);区间1:1,2:1,3:4;蓝球08(20期3次);总和135",
+              "hit_result": {
+                "red_hits": [
+                  "08",
+                  "24",
+                  "30"
+                ],
+                "red_hit_count": 3,
+                "blue_hit": false,
+                "total_hits": 3
+              }
+            },
+            {
+              "group_id": 2,
+              "strategy": "增强型冷号逆向者",
+              "red_balls": [
+                "01",
+                "06",
+                "11",
+                "12",
+                "17",
+                "20"
+              ],
+              "blue_ball": "07",
+              "description": "01(遗漏10期),06(遗漏4期),11(遗漏8期),12(遗漏2期),17(遗漏2期),20(遗漏20期);奇偶3:3,大小3:3;蓝球07(遗漏13期);总和67",
+              "hit_result": {
+                "red_hits": [
+                  "12"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            },
+            {
+              "group_id": 3,
+              "strategy": "增强型平衡策略师",
+              "red_balls": [
+                "05",
+                "09",
+                "14",
+                "18",
+                "23",
+                "27"
+              ],
+              "blue_ball": "07",
+              "description": "中频号为主,奇偶3:3,大小3:3;总和96;无连号;区间分布2-2-2;蓝球07(中频)",
+              "hit_result": {
+                "red_hits": [
+                  "18"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            },
+            {
+              "group_id": 4,
+              "strategy": "增强型周期理论家",
+              "red_balls": [
+                "03",
+                "13",
+                "17",
+                "19",
+                "21",
+                "26"
+              ],
+              "blue_ball": "07",
+              "description": "03(趋势分+23),19(趋势分+27),21(趋势分+20),17(趋势分+10),13(趋势分+7),26(趋势分+7);蓝球07(当前遗漏13期,平均遗漏10期)",
+              "hit_result": {
+                "red_hits": [
+                  "21"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            },
+            {
+              "group_id": 5,
+              "strategy": "增强型综合决策者",
+              "red_balls": [
+                "08",
+                "13",
+                "19",
+                "24",
+                "28",
+                "31"
+              ],
+              "blue_ball": "07",
+              "description": "08(综合分85,热号+周期),19(综合分82,周期+平衡),24(综合分78,热号+平衡);奇偶3:3;总和123;来自热号2个、冷号1个、周期2个、平衡1个",
+              "hit_result": {
+                "red_hits": [
+                  "08",
+                  "24"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            },
+            {
+              "group_id": 6,
+              "strategy": "玄门命理风水师",
+              "red_balls": [
+                "01",
+                "02",
+                "11",
+                "12",
+                "21",
+                "22"
+              ],
+              "blue_ball": "07",
+              "description": "周四属木逢亥时水,水生木,生旺木;期号起卦雷天大壮,喜木,选01,02,11,12,21,22;奇偶3:3;蓝球07属性金生水",
+              "hit_result": {
+                "red_hits": [
+                  "12",
+                  "21"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            }
+          ],
+          "best_group": 1,
+          "best_hit_count": 3
+        },
+        {
+          "model_id": "deepseek-v4-flash",
+          "model_name": "deepseek-v4-flash",
+          "predictions": [
+            {
+              "group_id": 1,
+              "strategy": "增强型热号追随者",
+              "red_balls": [
+                "09",
+                "16",
+                "21",
+                "24",
+                "27",
+                "32"
+              ],
+              "blue_ball": "08",
+              "description": "基于5期加权频率，09(5期2次)、16(5期3次)等高频号；区间分布2-2-2；蓝球08(20期内5次)；总和129",
+              "hit_result": {
+                "red_hits": [
+                  "21",
+                  "24"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            },
+            {
+              "group_id": 2,
+              "strategy": "增强型冷号逆向者",
+              "red_balls": [
+                "01",
+                "06",
+                "12",
+                "17",
+                "20",
+                "29"
+              ],
+              "blue_ball": "02",
+              "description": "选择12(遗漏14期)、29(遗漏11期)等长遗漏号；奇偶3:3，大小3:3；蓝球02(遗漏12期)；总和85",
+              "hit_result": {
+                "red_hits": [
+                  "12"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            },
+            {
+              "group_id": 3,
+              "strategy": "增强型平衡策略师",
+              "red_balls": [
+                "04",
+                "10",
+                "13",
+                "19",
+                "25",
+                "30"
+              ],
+              "blue_ball": "10",
+              "description": "中频号为主，奇偶3:3，大小3:3；总和101；无连号；区间分布2-2-2；蓝球10(中频)",
+              "hit_result": {
+                "red_hits": [
+                  "30"
+                ],
+                "red_hit_count": 1,
+                "blue_hit": false,
+                "total_hits": 1
+              }
+            },
+            {
+              "group_id": 4,
+              "strategy": "增强型周期理论家",
+              "red_balls": [
+                "09",
+                "16",
+                "21",
+                "24",
+                "27",
+                "32"
+              ],
+              "blue_ball": "04",
+              "description": "选择09(趋势分+20)、16(趋势分+30)等上升趋势号；蓝球04(当前遗漏8期，平均遗漏7.5期)",
+              "hit_result": {
+                "red_hits": [
+                  "21",
+                  "24"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            },
+            {
+              "group_id": 5,
+              "strategy": "增强型综合决策者",
+              "red_balls": [
+                "09",
+                "16",
+                "21",
+                "24",
+                "27",
+                "32"
+              ],
+              "blue_ball": "08",
+              "description": "09(综合分83，热号+周期双高)、16(综合分81，热号+周期)；奇偶4:2；总和129；来自热号2个、冷号0个、周期2个、平衡2个",
+              "hit_result": {
+                "red_hits": [
+                  "21",
+                  "24"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            },
+            {
+              "group_id": 6,
+              "strategy": "玄门命理风水师",
+              "red_balls": [
+                "09",
+                "11",
+                "18",
+                "23",
+                "28",
+                "30"
+              ],
+              "blue_ball": "08",
+              "description": "周四属木逢亥时水，生旺木火，选11,23；期号26075得离卦，喜木火，选09,18；奇偶3:3；蓝球08属性为金生水",
+              "hit_result": {
+                "red_hits": [
+                  "18",
+                  "30"
+                ],
+                "red_hit_count": 2,
+                "blue_hit": false,
+                "total_hits": 2
+              }
+            }
+          ],
+          "best_group": 1,
+          "best_hit_count": 2
+        }
+      ]
+    },
+    {
       "prediction_date": "2026-03-08",
       "target_period": "26025",
       "actual_result": {

@@ -8,23 +8,30 @@ import json
 import os
 import sys
 from datetime import datetime, timedelta
+
+import requests
 from openai import OpenAI
 from typing import Dict, Any
+import fetch_history
+from fetch_history import fetch_lottery_history
+from four_pillars import calculate_four_pillars, calculate_personal_bazi
 
 # ==================== 配置区 ====================
 # API 配置（通过环境变量设置）
-BASE_URL = os.environ.get("AI_BASE_URL") or "https://aihubmix.com/v1"
-API_KEY = os.environ.get("AI_API_KEY")
+BASE_URL = os.environ.get("SSQ_AI_BASE_URL")
+API_KEY = os.environ.get("SSQ_AI_API_KEY")
+PUSH_PLUS_TOKEN = os.environ.get("SSQ_PUSH_PLUS_TOKEN")
+ba_zi =  os.environ.get("SSQ_BA_ZI")
 if not API_KEY:
     print("❌ 请设置环境变量 AI_API_KEY")
     sys.exit(1)
 
 # 模型配置列表
 MODELS = [
-    {"id": "gpt-4o", "name": "GPT-5", "model_id": "SSB-Team-001"},
-    {"id": "claude-3-5-sonnet-20241022", "name": "Claude 4.5", "model_id": "team_alpha_arena_v1"},
-    {"id": "gemini-2.5-flash", "name": "Gemini 2.5", "model_id": "Gemini2.5"},
-    {"id": "deepseek-chat", "name": "DeepSeek R1", "model_id": "DeepseekR1"}
+    {"id": "glm-5.1", "name": "glm-5.1", "model_id": "glm-5.1"},
+    {"id": "gemini-3-flash-preview", "name": "gemini-3-flash-preview", "model_id": "gemini-3-flash-preview"},
+    {"id": "sensenova-6.7-flash-lite", "name": "sensenova-6.7-flash-lite", "model_id": "sensenova-6.7-flash-lite"},
+    {"id": "deepseek-v4-flash", "name": "deepseek-v4-flash", "model_id": "deepseek-v4-flash"}
 ]
 
 # 文件路径
@@ -32,14 +39,15 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOTTERY_HISTORY_FILE = os.path.join(SCRIPT_DIR, "data", "lottery_history.json")
 AI_PREDICTIONS_FILE = os.path.join(SCRIPT_DIR, "data", "ai_predictions.json")
 PREDICTIONS_HISTORY_FILE = os.path.join(SCRIPT_DIR, "data", "predictions_history.json")
-PROMPT_FILE = os.path.join(SCRIPT_DIR, "doc", "prompt2.0.md")
+PROMPT_FILE = os.path.join(SCRIPT_DIR, "doc", "prompt3.0.md")
+CHOICE_FILE = os.path.join(SCRIPT_DIR, "doc", "prompt3.1.md")
 
 # ==================== 工具函数 ====================
 
-def load_prompt_template() -> str:
+def load_prompt_template(file: str) -> str:
     """加载 Prompt 模板文件"""
     try:
-        with open(PROMPT_FILE, 'r', encoding='utf-8') as f:
+        with open(file, 'r', encoding='utf-8') as f:
             return f.read()
     except Exception as e:
         print(f"❌ 加载 Prompt 文件失败: {str(e)}")
@@ -118,7 +126,8 @@ def call_ai_model(client: OpenAI, model_config: Dict[str, str], prompt: str) -> 
                     "content": prompt
                 }
             ],
-            temperature=0.8
+            temperature=0.8,
+            response_format={"type": "json_object"}
         )
 
         response_text = response.choices[0].message.content.strip()
@@ -155,7 +164,7 @@ def validate_prediction(prediction: Dict[str, Any]) -> bool:
                 return False
 
         # 检查预测组数量
-        if len(prediction["predictions"]) != 5:
+        if len(prediction["predictions"]) != 6:
             print(f"    ⚠️  预测组数量不正确: {len(prediction['predictions'])}")
             return False
 
@@ -192,7 +201,7 @@ def generate_predictions() -> Dict[str, Any]:
     # 加载 Prompt 模板
     print("📄 加载 Prompt 模板...")
     try:
-        prompt_template = load_prompt_template()
+        prompt_template = load_prompt_template(PROMPT_FILE)
         print(f"  ✓ Prompt 模板加载成功 ({len(prompt_template)} 字符)\n")
     except Exception as e:
         print(f"  ✗ Prompt 模板加载失败: {str(e)}\n")
@@ -270,6 +279,7 @@ def generate_predictions() -> Dict[str, Any]:
     result = {
         "prediction_date": prediction_date,
         "target_period": target_period,
+        "target_date": target_date,
         "models": all_predictions
     }
 
@@ -405,9 +415,183 @@ def save_predictions(predictions: Dict[str, Any]):
         print(f"❌ 保存失败: {str(e)}")
         raise
 
+def load_ai_predictions() -> Dict[str, Any]:
+    """加载历史开奖数据"""
+    try:
+        with open(AI_PREDICTIONS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"❌ 加载历史数据失败: {str(e)}")
+        raise
+
+def _parse_bazi_hour(bazi_hour) -> int:
+    """
+    将各种格式的时间转换为小时整数（0-23）
+
+    支持格式：
+      - int:              21           → 21
+      - "HH:MM":         "21:15"      → 21
+      - "HH:MM-HH:MM":   "21:00-23:00"→ 21（取起始小时）
+      - "HH:MM~HH:MM":   "21:00~23:00"→ 21（取起始小时）
+    """
+    if isinstance(bazi_hour, int):
+        return bazi_hour
+    s = str(bazi_hour).strip()
+    # 取范围起始部分（支持 - 和 ~ 分隔）
+    for sep in ['-', '~']:
+        if sep in s:
+            s = s.split(sep)[0].strip()
+            break
+    # 解析 HH:MM 或 HH
+    if ':' in s:
+        return int(s.split(':')[0])
+    return int(s)
+
+
+def choice_predictions_data(target_period, target_date, prediction_date,
+                             bazi_date, bazi_hour,
+                             birth_place,
+                             live_place,
+                            shi_chen='巳'):
+    """
+    生成评估预测数据
+
+    :param target_period:   目标期号，如 '26075'
+    :param target_date:     开奖日期显示字符串，如 '2026年07月02日'（不做修改，仅用于展示）
+    :param prediction_date: 预测日期，ISO格式 'YYYY-MM-DD'
+    :param bazi_date:       用于计算开奖日四柱的公历日期，ISO格式 'YYYY-MM-DD'
+    :param bazi_hour:       开奖时刻，支持多种格式（默认 '21:15'，即亥时）：
+                              - int 整数：21
+                              - 时间字符串：'21:15'
+                              - 时间范围字符串：'21:00-23:00' 或 '21:00~23:00'（取起始小时）
+    :param shi_chen:        命主出生时辰（如 '巳'）
+    :param birth_place:     命主出生地（如 '河南信阳'）
+    :param live_place:      命主居住地（如 '广东深圳'）
+    """
+    dt = datetime.strptime(bazi_date, "%Y-%m-%d")
+    lunar_year = int(dt.year)
+    lunar_month = int(dt.month)
+    lunar_day = int(dt.day)
+    # 解析开奖时刻为小时整数
+    hour = _parse_bazi_hour(bazi_hour)
+
+    # 加载 Prompt 模板
+    print("📄 加载 评估 Prompt 模板...")
+    try:
+        prompt_template = load_prompt_template(CHOICE_FILE)
+        print(f"  ✓ ai Prompt 评估模板加载成功 ({len(prompt_template)} 字符)\n")
+    except Exception as e:
+        print(f"  ✗ Prompt 评估模板加载失败: {str(e)}\n")
+        return None
+
+    # 加载历史数据
+    print("📊 加载AI生成数据...")
+    ai_data = load_ai_predictions()
+    ai_predictions = json.dumps(ai_data, ensure_ascii=False, indent=2)
+
+    # 计算开奖日四柱八字
+    # bazi_date: 公历ISO格式 "YYYY-MM-DD"
+    # bazi_hour: 原始传入值（如 "21:00-23:00"），解析为 hour 整数后传给 calculate_four_pillars
+    print(f"🔯 计算开奖日四柱八字（{bazi_date} {bazi_hour}，解析时刻 hour={hour}）...")
+    four_pillars_data = calculate_four_pillars(bazi_date, hour=hour)
+    four_pillars_json = json.dumps(four_pillars_data, ensure_ascii=False, indent=2)
+
+    # 动态计算命主八字（根据传入参数）
+    if lunar_year and lunar_month and lunar_day:
+        personal_bazi = calculate_personal_bazi(
+            lunar_year=lunar_year,
+            lunar_month=lunar_month,
+            lunar_day=lunar_day,
+            shi_chen=shi_chen,
+            birth_place=birth_place,
+            live_place=live_place
+        )
+    else:
+        print("no")
+
+    personal_bazi_json = json.dumps(personal_bazi, ensure_ascii=False, indent=2)
+    print(f"  ✓ 开奖日四柱：{four_pillars_data.get('four_pillars_gz', '')}")
+    print(f"  ✓ 命主八字：{personal_bazi.get('four_pillars_str', '')}\n")
+
+    # 初始化 OpenAI 客户端
+    client = get_openai_client()
+
+    # 存储所有模型的预测
+    all_predictions = []
+
+    # 逐个调用模型
+    print("🔮 开始生成预测...\n")
+    for model_config in MODELS:
+        if model_config['id'] != 'glm-5.1':
+            print("非glm-5.2，跳过预测")
+            continue
+        try:
+            # 构建 prompt
+            prompt = prompt_template.format(
+                target_period=target_period,
+                target_date=target_date,
+                ai_predictions=ai_predictions,
+                prediction_date=prediction_date,
+                model_id=model_config['model_id'],
+                model_name=model_config['name'],
+                four_pillars=four_pillars_json,
+                personal_bazi=personal_bazi_json,
+            )
+
+            # 调用模型
+            prediction = call_ai_data_model(client, model_config, prompt)
+            print(prediction)
+            if PUSH_PLUS_TOKEN is not None:
+                send_pushplus("双色球预测结果",prediction,PUSH_PLUS_TOKEN)
+
+        except Exception as e:
+            print(f"  ✗ 处理 {model_config['name']} 时失败")
+            print(f"  错误类型: {type(e).__name__}")
+            print(f"  错误信息: {str(e)}\n")
+            continue
+
+def call_ai_data_model(client: OpenAI, model_config: Dict[str, str], prompt: str) -> Dict[str, Any]:
+    """调用 AI 模型获取预测"""
+    try:
+        print(f"  ⏳ 正在调用 {model_config['name']} 模型...")
+
+        response = client.chat.completions.create(
+            model=model_config['id'],
+            messages=[
+                {
+                    "role": "system",
+                    "content": "你是一个专业的彩票数据分析师，擅长基于历史数据进行模式分析和预测。请严格按照要求返回markdown格式数据，不要有任何额外的解释或说明。"
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.8
+        )
+
+        response_text = response.choices[0].message.content.strip()
+
+        print(f"  ✅ {model_config['name']} 预测成功")
+        return response_text
+
+    except json.JSONDecodeError as e:
+        print(f"  ❌ {model_config['name']} JSON 解析失败: {str(e)}")
+        print(f"  原始响应前500字符:\n{response_text[:500]}")
+        raise
+    except Exception as e:
+        print(f"  ❌ {model_config['name']} 调用失败")
+        print(f"  错误类型: {type(e).__name__}")
+        print(f"  错误信息: {str(e)}")
+        import traceback
+        print(f"  详细堆栈:\n{traceback.format_exc()}")
+        raise
+
 def main():
     """主函数"""
     try:
+
+        fetch_lottery_history.main()
         # 生成预测
         predictions = generate_predictions()
 
@@ -430,9 +614,70 @@ def main():
         else:
             print("❌ 预测生成失败")
 
+        # bazi_date: 开奖日公历日期（ISO格式）
+        # bazi_hour: 开奖时刻，支持 int/时间字符串/时间范围字符串
+        #   双色球固定 21:15 开奖（亥时 21:00-23:00），可传入以下任意格式：
+        #     bazi_hour=21             → 整数
+        #     bazi_hour='21:15'        → 精确时刻
+        #     bazi_hour='21:00-23:00'  → 时间范围（取起始小时）
+        province_city1=""   # 出生地
+        province_city2=""  #居住地
+        date_part=""  # 1996-12-13
+        time_part="" # 9:00-10
+        if ba_zi:
+            # 1. 首先用 '&' 将四大块内容切开
+            parts = ba_zi.split('&')
+
+            # 2. 分别赋值给对应的变量
+            province_city1 = parts[0]
+            province_city2 = parts[1]
+            date_part = parts[2]  # 1992-12-13
+            time_part = parts[3]  # 9:00-10
+        choice_predictions_data(predictions['target_period'],predictions['target_date'], predictions['prediction_date'],
+                                date_part,
+                                time_part,
+                                province_city1,
+                                province_city2)
+        # choice_predictions_data("1992-12-13", '1992-12-13',
+        #                         "2026-07-05",
+        #                         date_part,
+        #                         time_part,
+        #                         province_city1,
+        #                         province_city2)
+
     except Exception as e:
         print(f"\n❌ 程序执行出错: {str(e)}")
         raise
+
+
+def send_pushplus(title, content, token):
+    """
+    使用 pushplus 发送 HTML 模板通知
+    """
+    # 基础 URL
+    base_url = "http://www.pushplus.plus/send"
+    # 构建请求参数
+    # 使用 params 参数，requests 库会自动帮你进行 URL 编码（解决中文乱码问题）
+    payload = {
+        "token": token,
+        "title": title,
+        "content": content,
+        "template": "markdown"
+    }
+    try:
+        # 发送 GET 请求
+        response = requests.get(base_url, params=payload)
+        # 解析返回的 JSON 结果
+        result = response.json()
+        # 状态码 200 通常代表 pushplus 接口响应成功
+        if result.get("code") == 200:
+            print(f"【推送成功】: {result.get('msg')}")
+        else:
+            print(f"【推送失败】: 错误码 {result.get('code')}, 原因: {result.get('msg')}")
+        return result
+    except Exception as e:
+        print(f"【请求发生异常】: {e}")
+        return None
 
 if __name__ == "__main__":
     main()
