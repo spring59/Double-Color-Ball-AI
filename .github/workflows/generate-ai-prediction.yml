@@ -49,6 +49,9 @@ jobs:
           SSQ_AI_API_KEY: ${{ secrets.SSQ_AI_API_KEY }}
           SSQ_PUSH_PLUS_TOKEN: ${{ secrets.SSQ_PUSH_PLUS_TOKEN }}
           SSQ_BA_ZI: ${{ secrets.SSQ_BA_ZI }}
+          SSQ_PUSH_WX_URL: ${{ secrets.SSQ_PUSH_WX_URL }}
+          SSQ_PUSH_WX_USER: ${{ secrets.SSQ_PUSH_WX_USER }}
+          SSQ_PUSH_WX_TOKEN: ${{ secrets.SSQ_PUSH_WX_TOKEN }}
 
       - name: Check for changes
         id: check_changes
