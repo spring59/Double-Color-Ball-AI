@@ -4,9 +4,9 @@ on:
   schedule:
     # 每周一、三、五 UTC 00:00（北京时间 08:00）自动运行
     # 对应开奖后一天：周日开奖→周一，周二开奖→周三，周四开奖→周五
-    # 每天北京时间 19:00 运行（对应 UTC 时间 11:00）
-    # 11 代表 11 点，2,4,0 代表周二、周四、周日
-    - cron: '0 11 * * 2,4,0'
+    # 每天北京时间 17:30 运行（对应 UTC 时间 09:30）
+    # 30 09 代表 UTC 09:30，2,4,0 代表周二、周四、周日
+    - cron: '30 9 * * 2,4,0'
   workflow_dispatch: # 也支持手动触发
 
 jobs:
@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
+    # 🌟 全局设置时区为北京时间
+    env:
+      TZ: Asia/Shanghai
 
     steps:
       - name: Checkout repository
@@ -30,7 +34,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
 #          pip install openai
-          python -m pip install requirements.txt
+          python -m pip install -r requirements.txt
 
       - name: Run AI prediction generator
         run: python3 generate_ai_prediction.py
@@ -49,7 +53,7 @@ jobs:
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           echo "✅ AI predictions generated successfully" >> $GITHUB_STEP_SUMMARY
-          echo "Generated at: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "Generated at: $(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_STEP_SUMMARY
 
       - name: No changes
         if: steps.check_changes.outputs.changed != 'true'

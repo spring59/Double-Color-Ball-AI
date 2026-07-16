@@ -21,6 +21,12 @@ from four_pillars import calculate_four_pillars, calculate_personal_bazi
 BASE_URL = os.environ.get("SSQ_AI_BASE_URL")
 API_KEY = os.environ.get("SSQ_AI_API_KEY")
 PUSH_PLUS_TOKEN = os.environ.get("SSQ_PUSH_PLUS_TOKEN")
+
+#微信
+PUSH_WX_URL = os.environ.get("SSQ_PUSH_WX_URL")
+PUSH_WX_USER = os.environ.get("SSQ_PUSH_WX_USER")
+PUSH_WX_TOKEN = os.environ.get("SSQ_PUSH_WX_TOKEN")
+
 ba_zi =  os.environ.get("SSQ_BA_ZI")
 if not API_KEY:
     print("❌ 请设置环境变量 AI_API_KEY")
@@ -674,6 +680,34 @@ def send_pushplus(title, content, token):
             print(f"【推送成功】: {result.get('msg')}")
         else:
             print(f"【推送失败】: 错误码 {result.get('code')}, 原因: {result.get('msg')}")
+        return result
+    except Exception as e:
+        print(f"【请求发生异常】: {e}")
+        return None
+
+def send_push_wx(content):
+    """
+    使用 pushplus 发送 HTML 模板通知
+    """
+    # 基础 URL
+    base_url = PUSH_WX_URL
+    # 构建请求参数
+    # 使用 params 参数，requests 库会自动帮你进行 URL 编码（解决中文乱码问题）
+    payload = {
+        "token": PUSH_WX_TOKEN,
+        "touser": PUSH_WX_USER,
+        "content": content
+    }
+    try:
+        # 发送 GET 请求
+        response = requests.get(base_url, params=payload)
+        # 解析返回的 JSON 结果
+        result = response.json()
+        # 状态码 200 通常代表 pushplus 接口响应成功
+        if result.get("errcode") == 0:
+            print(f"【推送成功 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}】: {result.get('errmsg')}")
+        else:
+            print(f"【推送失败】: 错误码 {result.get('errcode')}, 原因: {result.get('errmsg')}")
         return result
     except Exception as e:
         print(f"【请求发生异常】: {e}")
