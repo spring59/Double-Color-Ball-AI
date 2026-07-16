@@ -1,13 +1,17 @@
 name: Generate AI Prediction
 
 on:
+  # 1. 定时触发：北京时间每周二、四、日 17:30 运行（对应 UTC 09:30）
   schedule:
-    # 每周一、三、五 UTC 00:00（北京时间 08:00）自动运行
-    # 对应开奖后一天：周日开奖→周一，周二开奖→周三，周四开奖→周五
-    # 每天北京时间 17:30 运行（对应 UTC 时间 09:30）
-    # 30 09 代表 UTC 09:30，2,4,0 代表周二、周四、周日
     - cron: '30 9 * * 2,4,0'
-  workflow_dispatch: # 也支持手动触发
+
+  # 2. 手动触发：支持在 GitHub Actions 界面手动点击运行
+  workflow_dispatch:
+
+  # 3. 新增推送触发：当向 my_color 分支推送代码（或者合并 PR）时自动触发
+  push:
+    branches:
+      - my_color
 
 jobs:
   generate-prediction:
@@ -35,7 +39,10 @@ jobs:
           python -m pip install --upgrade pip
 #          pip install openai
           python -m pip install -r requirements.txt
-
+      - name: Run lottery data fetcher
+        run: |
+          cd fetch_history
+          python3 fetch_lottery_history.py
       - name: Run AI prediction generator
         run: python3 generate_ai_prediction.py
         env:
