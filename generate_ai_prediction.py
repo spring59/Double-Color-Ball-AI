@@ -547,8 +547,10 @@ def choice_predictions_data(target_period, target_date, prediction_date,
             # 调用模型
             prediction = call_ai_data_model(client, model_config, prompt)
             print(prediction)
-            if PUSH_PLUS_TOKEN is not None:
-                send_pushplus("双色球预测结果",prediction,PUSH_PLUS_TOKEN)
+            # if PUSH_PLUS_TOKEN is not None:
+            #     send_pushplus("双色球预测结果",prediction,PUSH_PLUS_TOKEN)
+            if PUSH_WX_TOKEN is not None:
+                send_push_wx(prediction)
 
         except Exception as e:
             print(f"  ✗ 处理 {model_config['name']} 时失败")
