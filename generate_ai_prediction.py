@@ -19,13 +19,13 @@ from four_pillars import calculate_four_pillars, calculate_personal_bazi
 # ==================== 配置区 ====================
 # API 配置（通过环境变量设置）
 BASE_URL = os.environ.get("SSQ_AI_BASE_URL")
-API_KEY = os.environ.get("SSQ_AI_API_KEY")
+API_KEY = os.environ.get("SSQ_AI_API_KEY","1")
 PUSH_PLUS_TOKEN = os.environ.get("SSQ_PUSH_PLUS_TOKEN")
 
 #微信
-PUSH_WX_URL = os.environ.get("SSQ_PUSH_WX_URL")
-PUSH_WX_USER = os.environ.get("SSQ_PUSH_WX_USER")
-PUSH_WX_TOKEN = os.environ.get("SSQ_PUSH_WX_TOKEN")
+PUSH_WX_URL = os.environ.get("SSQ_PUSH_WX_URL","http://ray.1314921.xyz:8800/notify/send/message")
+PUSH_WX_USER = os.environ.get("SSQ_PUSH_WX_USER","QinFengRui")
+PUSH_WX_TOKEN = os.environ.get("SSQ_PUSH_WX_TOKEN","50944378")
 
 ba_zi =  os.environ.get("SSQ_BA_ZI")
 if not API_KEY:
@@ -679,7 +679,7 @@ def send_push_plus(title, content, token):
     }
     try:
         # 发送 GET 请求
-        response = requests.get(base_url, params=payload)
+        response = requests.get(base_url, json=payload)
         # 解析返回的 JSON 结果
         result = response.json()
         # 状态码 200 通常代表 pushplus 接口响应成功
@@ -689,7 +689,7 @@ def send_push_plus(title, content, token):
             print(f"【推送失败】: 错误码 {result.get('code')}, 原因: {result.get('msg')}")
         return result
     except Exception as e:
-        print(f"【请求发生异常】: {e}")
+        print(f"【pushplus请求发生异常】: {e}")
         return None
 
 def send_push_wx(content):
@@ -707,7 +707,7 @@ def send_push_wx(content):
     }
     try:
         # 发送 GET 请求
-        response = requests.post(base_url, params=payload)
+        response = requests.post(base_url, json=payload)
         # 解析返回的 JSON 结果
         result = response.json()
         # 状态码 200 通常代表 pushplus 接口响应成功
@@ -717,7 +717,7 @@ def send_push_wx(content):
             print(f"【推送失败】: 错误码 {result.get('errcode')}, 原因: {result.get('errmsg')}")
         return result
     except Exception as e:
-        print(f"【请求发生异常】: {e}")
+        print(f"【PUSH_WX请求发生异常】: {e}")
         return None
 
 if __name__ == "__main__":
