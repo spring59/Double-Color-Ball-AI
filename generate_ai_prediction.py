@@ -702,7 +702,7 @@ def send_push_wx(content):
     }
     try:
         # 发送 GET 请求
-        response = requests.get(base_url, params=payload)
+        response = requests.post(base_url, params=payload)
         # 解析返回的 JSON 结果
         result = response.json()
         # 状态码 200 通常代表 pushplus 接口响应成功
