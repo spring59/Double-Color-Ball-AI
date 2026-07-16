@@ -547,11 +547,16 @@ def choice_predictions_data(target_period, target_date, prediction_date,
             # 调用模型
             prediction = call_ai_data_model(client, model_config, prompt)
             print(prediction)
-            # if PUSH_PLUS_TOKEN is not None:
-            #     send_pushplus("双色球预测结果",prediction,PUSH_PLUS_TOKEN)
-            if PUSH_WX_TOKEN is not None:
-                send_push_wx(prediction)
-
+            try:
+                if PUSH_PLUS_TOKEN is not None:
+                    send_push_plus("双色球预测结果", prediction, PUSH_PLUS_TOKEN)
+            except Exception as e:
+                print(f"send_push_plus错误信息: {str(e)}\n")
+            try:
+                if PUSH_WX_TOKEN is not None:
+                    send_push_wx(prediction)
+            except Exception as e:
+                print(f"send_push_wx错误信息: {str(e)}\n")
         except Exception as e:
             print(f"  ✗ 处理 {model_config['name']} 时失败")
             print(f"  错误类型: {type(e).__name__}")
@@ -658,7 +663,7 @@ def main():
         raise
 
 
-def send_pushplus(title, content, token):
+def send_push_plus(title, content, token):
     """
     使用 pushplus 发送 HTML 模板通知
     """
