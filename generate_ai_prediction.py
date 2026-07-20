@@ -19,8 +19,14 @@ from four_pillars import calculate_four_pillars, calculate_personal_bazi
 # ==================== 配置区 ====================
 # API 配置（通过环境变量设置）
 BASE_URL = os.environ.get("SSQ_AI_BASE_URL")
-API_KEY = os.environ.get("SSQ_AI_API_KEY")
+API_KEY = os.environ.get("SSQ_AI_API_KEY","1")
 PUSH_PLUS_TOKEN = os.environ.get("SSQ_PUSH_PLUS_TOKEN")
+
+#微信
+PUSH_WX_URL = os.environ.get("SSQ_PUSH_WX_URL","http://ray.1314921.xyz:8800/notify/send/message")
+PUSH_WX_USER = os.environ.get("SSQ_PUSH_WX_USER","QinFengRui")
+PUSH_WX_TOKEN = os.environ.get("SSQ_PUSH_WX_TOKEN","50944378")
+
 ba_zi =  os.environ.get("SSQ_BA_ZI")
 if not API_KEY:
     print("❌ 请设置环境变量 AI_API_KEY")
@@ -541,9 +547,16 @@ def choice_predictions_data(target_period, target_date, prediction_date,
             # 调用模型
             prediction = call_ai_data_model(client, model_config, prompt)
             print(prediction)
-            if PUSH_PLUS_TOKEN is not None:
-                send_pushplus("双色球预测结果",prediction,PUSH_PLUS_TOKEN)
-
+            try:
+                if PUSH_PLUS_TOKEN is not None:
+                    send_push_plus("双色球预测结果", prediction, PUSH_PLUS_TOKEN)
+            except Exception as e:
+                print(f"send_push_plus错误信息: {str(e)}\n")
+            try:
+                if PUSH_WX_TOKEN is not None:
+                    send_push_wx(prediction)
+            except Exception as e:
+                print(f"send_push_wx错误信息: {str(e)}\n")
         except Exception as e:
             print(f"  ✗ 处理 {model_config['name']} 时失败")
             print(f"  错误类型: {type(e).__name__}")
@@ -650,7 +663,7 @@ def main():
         raise
 
 
-def send_pushplus(title, content, token):
+def send_push_plus(title, content, token):
     """
     使用 pushplus 发送 HTML 模板通知
     """
@@ -666,7 +679,7 @@ def send_pushplus(title, content, token):
     }
     try:
         # 发送 GET 请求
-        response = requests.get(base_url, params=payload)
+        response = requests.get(base_url, json=payload)
         # 解析返回的 JSON 结果
         result = response.json()
         # 状态码 200 通常代表 pushplus 接口响应成功
@@ -676,7 +689,35 @@ def send_pushplus(title, content, token):
             print(f"【推送失败】: 错误码 {result.get('code')}, 原因: {result.get('msg')}")
         return result
     except Exception as e:
-        print(f"【请求发生异常】: {e}")
+        print(f"【pushplus请求发生异常】: {e}")
+        return None
+
+def send_push_wx(content):
+    """
+    使用 pushplus 发送 HTML 模板通知
+    """
+    # 基础 URL
+    base_url = PUSH_WX_URL
+    # 构建请求参数
+    # 使用 params 参数，requests 库会自动帮你进行 URL 编码（解决中文乱码问题）
+    payload = {
+        "token": PUSH_WX_TOKEN,
+        "touser": PUSH_WX_USER,
+        "content": content
+    }
+    try:
+        # 发送 GET 请求
+        response = requests.post(base_url, json=payload)
+        # 解析返回的 JSON 结果
+        result = response.json()
+        # 状态码 200 通常代表 pushplus 接口响应成功
+        if result.get("errcode") == 0:
+            print(f"【推送成功 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}】: {result.get('errmsg')}")
+        else:
+            print(f"【推送失败】: 错误码 {result.get('errcode')}, 原因: {result.get('errmsg')}")
+        return result
+    except Exception as e:
+        print(f"【PUSH_WX请求发生异常】: {e}")
         return None
 
 if __name__ == "__main__":

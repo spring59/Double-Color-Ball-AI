@@ -1,13 +1,17 @@
 name: Generate AI Prediction
 
 on:
+  # 1. 定时触发：北京时间每周二、四、日 17:30 运行（对应 UTC 09:30）
   schedule:
-    # 每周一、三、五 UTC 00:00（北京时间 08:00）自动运行
-    # 对应开奖后一天：周日开奖→周一，周二开奖→周三，周四开奖→周五
-    # 每天北京时间 19:00 运行（对应 UTC 时间 11:00）
-    # 11 代表 11 点，2,4,0 代表周二、周四、周日
-    - cron: '0 11 * * 2,4,0'
-  workflow_dispatch: # 也支持手动触发
+    - cron: '30 9 * * TUE,THU,SUN'
+
+  # 2. 手动触发：支持在 GitHub Actions 界面手动点击运行
+  workflow_dispatch:
+
+  # 3. 新增推送触发：当向 my_color 分支推送代码（或者合并 PR）时自动触发
+  push:
+    branches:
+      - my_color
 
 jobs:
   generate-prediction:
@@ -15,11 +19,16 @@ jobs:
     permissions:
       contents: write
 
+    # 🌟 全局设置时区为北京时间
+    env:
+      TZ: Asia/Shanghai
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          ref: ${{ github.event_name == 'schedule' && 'my_color' || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,8 +38,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
+          python -m pip install -r requirements.txt
+      - name: Run lottery data fetcher
+        run: |
+          cd fetch_history
+          python3 fetch_lottery_history.py
       - name: Run AI prediction generator
         run: python3 generate_ai_prediction.py
         env:
@@ -38,6 +50,9 @@ jobs:
           SSQ_AI_API_KEY: ${{ secrets.SSQ_AI_API_KEY }}
           SSQ_PUSH_PLUS_TOKEN: ${{ secrets.SSQ_PUSH_PLUS_TOKEN }}
           SSQ_BA_ZI: ${{ secrets.SSQ_BA_ZI }}
+          SSQ_PUSH_WX_URL: ${{ secrets.SSQ_PUSH_WX_URL }}
+          SSQ_PUSH_WX_USER: ${{ secrets.SSQ_PUSH_WX_USER }}
+          SSQ_PUSH_WX_TOKEN: ${{ secrets.SSQ_PUSH_WX_TOKEN }}
 
       - name: Check for changes
         id: check_changes
@@ -48,7 +63,7 @@ jobs:
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           echo "✅ AI predictions generated successfully" >> $GITHUB_STEP_SUMMARY
-          echo "Generated at: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "Generated at: $(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_STEP_SUMMARY
 
       - name: No changes
         if: steps.check_changes.outputs.changed != 'true'
