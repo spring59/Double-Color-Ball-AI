@@ -7,7 +7,11 @@ on:
 
   # 2. 手动触发：支持在 GitHub Actions 界面手动点击运行
   workflow_dispatch:
-
+    inputs:
+      environment: # 必须在这里先定义这个名称
+        description: '运行环境'
+        required: false
+        default: 'production'
   # 3. 新增推送触发：当向 my_color 分支推送代码（或者合并 PR）时自动触发
   push:
     branches:
