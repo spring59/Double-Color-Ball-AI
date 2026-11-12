@@ -34,10 +34,10 @@ if not API_KEY:
 
 # 模型配置列表
 MODELS = [
-    {"id": "glm-5.1", "name": "glm-5.1", "model_id": "glm-5.1"},
-    {"id": "gemini-3-flash-preview", "name": "gemini-3-flash-preview", "model_id": "gemini-3-flash-preview"},
-    {"id": "sensenova-6.7-flash-lite", "name": "sensenova-6.7-flash-lite", "model_id": "sensenova-6.7-flash-lite"},
-    {"id": "deepseek-v4-flash", "name": "deepseek-v4-flash", "model_id": "deepseek-v4-flash"}
+    {"id": "blian_qwen38_max", "name": "blian_qwen38_max", "model_id": "blian_qwen38_max"},
+    {"id": "huoshan_glm_5_3", "name": "huoshan_glm_5_3", "model_id": "huoshan_glm_5_3"},
+    {"id": "sensenova-6.8-flash-lite", "name": "sensenova-6.8-flash-lite", "model_id": "sensenova-6.8-flash-lite"},
+    {"id": "blian_deepseek_v4_pro", "name": "blian_deepseek_v4_pro", "model_id": "blian_deepseek_v4_pro"}
 ]
 
 # 文件路径
